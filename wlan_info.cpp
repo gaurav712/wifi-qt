@@ -1,4 +1,4 @@
-#include "network.h"
+#include "wlan_info.h"
 
 WlanInfo::WlanInfo(void) {
     struct ifaddrs *ifad;

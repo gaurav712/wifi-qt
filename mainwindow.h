@@ -7,7 +7,10 @@
 #include <QDesktopWidget>
 #include <QScreen>
 
-#include "network.h"
+#include "wlan_info.h"
+
+#define BLOCK   1
+#define UNBLOCK 0
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -20,6 +23,7 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+    WlanInfo *wlanInfo;
 
 private slots:
     void on_refreshButton_clicked();
@@ -28,6 +32,5 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
-    WlanInfo *wlanInfo;
 };
 #endif // MAINWINDOW_H

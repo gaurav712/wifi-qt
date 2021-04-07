@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "rfkill_control.h"
 
 #include <iostream>
 
@@ -51,8 +52,13 @@ void MainWindow::on_refreshButton_clicked()
 
 void MainWindow::on_wlanToggleButton_clicked()
 {
-    std::string wlanInterfaceName;
-    // Check if wifi is enabled
-//    wlanInterfaceName = get_wireless_network_interface_name();
-    std::cout << wlanInterfaceName << std::endl;
+    //uncomment when needed
+
+    if(wlanInfo->wlan_is_on()) {
+//        toggle_wlan(BLOCK);
+        std::cout << "turning off.." << std::endl;
+    } else {
+//        toggle_wlan(UNBLOCK);
+        std::cout << "turning off.." << std::endl;
+    }
 }

@@ -11,12 +11,12 @@ CONFIG += c++11 c11
 SOURCES += \
     main.cpp \
     mainwindow.cpp \
-    rfkill_control.cpp \
+    wlan_control.cpp \
     wlan_info.cpp
 
 HEADERS += \
     mainwindow.h \
-    rfkill_control.h \
+    wlan_control.h \
     wlan_info.h
 
 FORMS += \

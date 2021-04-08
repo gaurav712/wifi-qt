@@ -1,6 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "rfkill_control.h"
+#include "wlan_control.h"
 
 #include <iostream>
 
@@ -33,17 +33,17 @@ MainWindow::MainWindow(QWidget *parent)
     } else {
         std::cout << "wlan is disconnected" << std::endl;
     }
-
-    delete wlanInfo;
 }
 
 MainWindow::~MainWindow()
 {
+    delete wlanInfo;
     delete ui;
 }
 
 
 void MainWindow::on_refreshButton_clicked()
+
 {
     QListWidget *networksList = ui->listWidget;
     networksList->addItem("Hey There!");
@@ -52,13 +52,10 @@ void MainWindow::on_refreshButton_clicked()
 
 void MainWindow::on_wlanToggleButton_clicked()
 {
-    //uncomment when needed
 
     if(wlanInfo->wlan_is_on()) {
-//        toggle_wlan(BLOCK);
-        std::cout << "turning off.." << std::endl;
+        toggle_wlan(BLOCK);
     } else {
-//        toggle_wlan(UNBLOCK);
-        std::cout << "turning off.." << std::endl;
+        toggle_wlan(UNBLOCK);
     }
 }

@@ -1,4 +1,9 @@
-#include "rfkill_control.h"
+#include <iostream>
+#include <stdlib.h>
+#include <string.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <linux/rfkill.h>
 
 void toggle_wlan(int mode) {
 
@@ -20,4 +25,11 @@ void toggle_wlan(int mode) {
     }
 
     close(fd);
+}
+
+
+int main(int argc, char *argv[]) {
+    printf("running with mode %d\n", atoi(argv[1]));
+    toggle_wlan(atoi(argv[1]));
+    return 0;
 }

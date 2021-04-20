@@ -9,9 +9,6 @@
 
 #include "wlan_info.h"
 
-#define BLOCK   1
-#define UNBLOCK 0
-
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE

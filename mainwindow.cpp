@@ -2,7 +2,8 @@
 #include "ui_mainwindow.h"
 #include "wlan_control.h"
 
-#include <iostream>
+#define BLOCK   1
+#define UNBLOCK 0
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -21,18 +22,6 @@ MainWindow::MainWindow(QWidget *parent)
     this->move((QApplication::desktop()->width())/2 - (this->size().width())/2, (QApplication::desktop()->height())/2 - (this->size().height())/2);
 
     wlanInfo = new WlanInfo;
-
-    if(wlanInfo->wlan_is_on()) {
-        std::cout << "wlan is up" << std::endl;
-    } else {
-        std::cout << "wlan is down" << std::endl;
-    }
-
-    if(wlanInfo->wlan_is_connected()) {
-        std::cout << "wlan is connected" << std::endl;
-    } else {
-        std::cout << "wlan is disconnected" << std::endl;
-    }
 }
 
 MainWindow::~MainWindow()
@@ -47,7 +36,6 @@ void MainWindow::on_refreshButton_clicked()
 {
     QListWidget *networksList = ui->listWidget;
     networksList->addItem("Hey There!");
-    std::cout<<"Hello"<<std::endl;
 }
 
 void MainWindow::on_wlanToggleButton_clicked()

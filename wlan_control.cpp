@@ -1,19 +1,19 @@
 /*
- * This uses a daemon called "priviledged_actions_service" to spawn specified commands
+ * This uses a daemon called "wlan_toggle_service" to toggle wifi
  *
- * It is here at: https://github.com/gaurav712/priviledged_actions_service
+ * It is here at: https://github.com/gaurav712/wlan_toggle_service
  */
 
 #include "wlan_control.h"
 
-std::string wpa_supplicant_cmd = "wpa_supplicant -i interface -D nl80211 -c config -B";
-
 void toggle_wlan(int mode) {
 
-    std::string toggle_cmd = "toggle ";
-
     int client_socket;
+    char toggle_cmd[2];
     struct sockaddr_in server_address;
+
+    toggle_cmd[0] = mode + '0';
+    toggle_cmd[1] = '\0';
 
     if((client_socket = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
         std::cerr << "socket() error!" << std::endl;
@@ -33,10 +33,8 @@ void toggle_wlan(int mode) {
         return;
     }
 
-    /* Append mode to the toggle command */
-    toggle_cmd = toggle_cmd + std::to_string(mode);
-
-    send(client_socket, toggle_cmd.c_str(), toggle_cmd.length(), 0);
+    /* Issue the command */
+    send(client_socket, toggle_cmd, 2, 0);
 
     shutdown(client_socket, SHUT_RDWR);
 }

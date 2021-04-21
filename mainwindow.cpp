@@ -22,10 +22,12 @@ MainWindow::MainWindow(QWidget *parent)
     this->move((QApplication::desktop()->width())/2 - (this->size().width())/2, (QApplication::desktop()->height())/2 - (this->size().height())/2);
 
     wlanInfo = new WlanInfo;
+    wpa_supplicant_events_listener = new WPASupplicantEventsListener(wlanInfo->wlan_interface_name);
 }
 
 MainWindow::~MainWindow()
 {
+    delete wpa_supplicant_events_listener;
     delete wlanInfo;
     delete ui;
 }
@@ -46,4 +48,9 @@ void MainWindow::on_wlanToggleButton_clicked()
     } else {
         toggle_wlan(UNBLOCK);
     }
+}
+
+void MainWindow::on_listWidget_itemDoubleClicked(QListWidgetItem *item)
+{
+    /* Connect to the selected network */
 }

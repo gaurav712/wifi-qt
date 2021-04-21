@@ -8,6 +8,7 @@
 #include <QScreen>
 
 #include "wlan_info.h"
+#include "wpa_supplicant_events_listener.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -24,10 +25,11 @@ public:
 
 private slots:
     void on_refreshButton_clicked();
-
     void on_wlanToggleButton_clicked();
+    void on_listWidget_itemDoubleClicked(QListWidgetItem *item);
 
 private:
     Ui::MainWindow *ui;
+    WPASupplicantEventsListener *wpa_supplicant_events_listener;
 };
 #endif // MAINWINDOW_H

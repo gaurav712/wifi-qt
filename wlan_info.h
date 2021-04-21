@@ -9,11 +9,10 @@
 
 class WlanInfo {
 private:
-    std::string wlan_interface_name;
-
     bool interface_is_wireless(void);
 
 public:
+    std::string wlan_interface_name;
 
     // The Constructor
     WlanInfo(void);

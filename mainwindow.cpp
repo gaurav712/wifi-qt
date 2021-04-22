@@ -19,14 +19,20 @@ MainWindow::MainWindow(QWidget *parent)
      * y = (height of screen)/2 - (height of window)/2
      */
 
-    this->move((QApplication::desktop()->width())/2 - (this->size().width())/2, (QApplication::desktop()->height())/2 - (this->size().height())/2);
+    this->move((QApplication::desktop()->width())/2 - (this->size().width())/2,
+               (QApplication::desktop()->height())/2 - (this->size().height())/2);
 
     wlanInfo = new WlanInfo;
+    wpa_supplicant_control = new WPASupplicantControl(wlanInfo->wlan_interface_name);
     wpa_supplicant_events_listener = new WPASupplicantEventsListener(wlanInfo->wlan_interface_name);
+
+    wpa_supplicant_control->send_cmd("PING");
+    qInfo() << wpa_supplicant_control->get_response();
 }
 
 MainWindow::~MainWindow()
 {
+    delete wpa_supplicant_control;
     delete wpa_supplicant_events_listener;
     delete wlanInfo;
     delete ui;

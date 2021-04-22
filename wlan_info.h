@@ -1,4 +1,3 @@
-#include <iostream>
 #include <fstream>
 #include <string.h>
 #include <fcntl.h>
@@ -6,6 +5,7 @@
 #include <ifaddrs.h>
 #include <linux/wireless.h>
 #include <sys/ioctl.h>
+#include <QDebug>
 
 class WlanInfo {
 private:

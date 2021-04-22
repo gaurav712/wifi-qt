@@ -13,12 +13,14 @@ SOURCES += \
     mainwindow.cpp \
     wlan_control.cpp \
     wlan_info.cpp \
+    wpa_supplicant_control.cpp \
     wpa_supplicant_events_listener.cpp
 
 HEADERS += \
     mainwindow.h \
     wlan_control.h \
     wlan_info.h \
+    wpa_supplicant_control.h \
     wpa_supplicant_events_listener.h
 
 FORMS += \

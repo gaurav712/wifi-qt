@@ -5,7 +5,7 @@ WlanInfo::WlanInfo(void) {
     std::string interface_name;
 
     if(getifaddrs(&ifad) == -1) {
-        std::cerr << "getifaddrs() failed!" << std::endl;
+        qFatal("getifaddrs() failed!");
         std::exit(1);
     }
 
@@ -36,7 +36,7 @@ bool WlanInfo::interface_is_wireless(void) {
     strncpy(iw.ifr_name, wlan_interface_name.c_str(), IFNAMSIZ);
 
     if((sock = socket(AF_INET, SOCK_DGRAM, 0)) == -1) {
-        std::cerr << "socket() failed!" << std::endl;
+        qFatal("socket() failed!");
         std::exit(1);
     }
 
@@ -58,7 +58,7 @@ bool WlanInfo::wlan_is_on(void) {
     strncpy(ifr.ifr_name, wlan_interface_name.c_str(), IFNAMSIZ);
 
     if (ioctl(sock, SIOCGIFFLAGS, &ifr) < 0) {
-        std::cerr << "ioctl(.., SIOCGIFFLAGS, ..) failed!" << std::endl;
+        qFatal("ioctl(.., SIOCGIFFLAGS, ..) failed!");
         std::exit(1);
     }
 
@@ -75,7 +75,7 @@ bool WlanInfo::wlan_is_connected(void) {
     strncpy(ifr.ifr_name, wlan_interface_name.c_str(), IFNAMSIZ);
 
     if (ioctl(sock, SIOCGIFFLAGS, &ifr) < 0) {
-        std::cerr << "ioctl(.., SIOCGIFFLAGS, ..) failed!" << std::endl;
+        qFatal("ioctl(.., SIOCGIFFLAGS, ..) failed!");
         std::exit(1);
     }
 

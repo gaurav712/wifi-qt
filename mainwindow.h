@@ -9,6 +9,7 @@
 
 #include "wlan_info.h"
 #include "wpa_supplicant_events_listener.h"
+#include "wpa_supplicant_control.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -31,5 +32,6 @@ private slots:
 private:
     Ui::MainWindow *ui;
     WPASupplicantEventsListener *wpa_supplicant_events_listener;
+    WPASupplicantControl *wpa_supplicant_control;
 };
 #endif // MAINWINDOW_H

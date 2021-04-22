@@ -16,7 +16,7 @@ void toggle_wlan(int mode) {
     toggle_cmd[1] = '\0';
 
     if((client_socket = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-        std::cerr << "socket() error!" << std::endl;
+        qCritical() << "socket() error!";
         return;
     }
 
@@ -29,7 +29,7 @@ void toggle_wlan(int mode) {
     server_address.sin_port = htons(PORT);
 
     if(connect(client_socket, (struct sockaddr *)&server_address, sizeof(server_address)) < 0) {
-        std::cerr << "connect() failed!" << std::endl;
+        qCritical() << "connect() failed!";
         return;
     }
 

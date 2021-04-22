@@ -3,10 +3,10 @@
 
 #endif // WLAN_CONTROL_H
 
-#include <iostream>
 #include <string.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
+#include <QDebug>
 
 #define HOST    "127.0.0.1"
 #define PORT    14465

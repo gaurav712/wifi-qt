@@ -1,11 +1,7 @@
-#include <fstream>
-#include <string.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <ifaddrs.h>
-#include <linux/wireless.h>
-#include <sys/ioctl.h>
-#include <QDebug>
+#include <iostream>
+
+#ifndef WLANINFO_H
+#define WLANINFO_H
 
 class WlanInfo {
 private:
@@ -20,3 +16,5 @@ public:
     bool wlan_is_on(void);
     bool wlan_is_connected(void);
 };
+
+#endif // WLANINFO_H

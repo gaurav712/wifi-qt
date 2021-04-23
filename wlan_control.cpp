@@ -4,6 +4,14 @@
  * It is here at: https://github.com/gaurav712/wlan_toggle_service
  */
 
+#include <string.h>
+#include <arpa/inet.h>
+#include <sys/socket.h>
+#include <QDebug>
+
+#define HOST    "127.0.0.1"
+#define PORT    14465
+
 #include "wlan_control.h"
 
 void toggle_wlan(int mode) {

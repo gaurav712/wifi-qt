@@ -1,3 +1,11 @@
+#include <string.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <ifaddrs.h>
+#include <linux/wireless.h>
+#include <sys/ioctl.h>
+#include <QDebug>
+
 #include "wlan_info.h"
 
 WlanInfo::WlanInfo(void) {
@@ -33,7 +41,7 @@ bool WlanInfo::interface_is_wireless(void) {
     char protocol[IFNAMSIZ];
 
     memset(&iw, 0, sizeof (iw));
-    strncpy(iw.ifr_name, wlan_interface_name.c_str(), IFNAMSIZ);
+    strncpy(iw.ifr_name, wlan_interface_name.c_str(), wlan_interface_name.length());
 
     if((sock = socket(AF_INET, SOCK_DGRAM, 0)) == -1) {
         qFatal("socket() failed!");
@@ -55,7 +63,7 @@ bool WlanInfo::wlan_is_on(void) {
 
     int sock = socket(PF_INET6, SOCK_DGRAM, 0);
     memset(&ifr, 0, sizeof(ifr));
-    strncpy(ifr.ifr_name, wlan_interface_name.c_str(), IFNAMSIZ);
+    strncpy(ifr.ifr_name, wlan_interface_name.c_str(), wlan_interface_name.length());
 
     if (ioctl(sock, SIOCGIFFLAGS, &ifr) < 0) {
         qFatal("ioctl(.., SIOCGIFFLAGS, ..) failed!");
@@ -72,7 +80,7 @@ bool WlanInfo::wlan_is_connected(void) {
 
     int sock = socket(PF_INET6, SOCK_DGRAM, 0);
     memset(&ifr, 0, sizeof(ifr));
-    strncpy(ifr.ifr_name, wlan_interface_name.c_str(), IFNAMSIZ);
+    strncpy(ifr.ifr_name, wlan_interface_name.c_str(), wlan_interface_name.length());
 
     if (ioctl(sock, SIOCGIFFLAGS, &ifr) < 0) {
         qFatal("ioctl(.., SIOCGIFFLAGS, ..) failed!");

@@ -1,12 +1,7 @@
 #ifndef WPASUPPLICANTCONTROL_H
 #define WPASUPPLICANTCONTROL_H
 
-#include <sys/socket.h>
-#include <sys/un.h>
-#include <string.h>
-#include <unistd.h>
 #include <QString>
-#include <QDebug>
 #include <QThread>
 
 class WPASupplicantControl
@@ -24,6 +19,7 @@ public:
     QString get_response();
 };
 
+/* The network scan thread class */
 class InitiateSearchThread: public QThread
 {
     Q_OBJECT

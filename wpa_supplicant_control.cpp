@@ -1,3 +1,9 @@
+#include <sys/socket.h>
+#include <sys/un.h>
+#include <string.h>
+#include <unistd.h>
+#include <QDebug>
+
 #include "wpa_supplicant_control.h"
 
 #define WPA_SEND_CTRL_IFACE_PREFIX "/run/wpa_supplicant/"   // append if_name
@@ -21,8 +27,8 @@ WPASupplicantControl::WPASupplicantControl(std::string wlan_interface_name)
     send_address.sun_family = AF_UNIX;
     recv_address.sun_family = AF_UNIX;
 
-    strncpy(send_address.sun_path, wpa_send_ctrl_iface.toStdString().c_str(), sizeof(send_address.sun_path));
-    strncpy(recv_address.sun_path, wpa_recv_ctrl_iface.toStdString().c_str(), sizeof(recv_address.sun_path));
+    strncpy(send_address.sun_path, wpa_send_ctrl_iface.toStdString().c_str(), wpa_send_ctrl_iface.length());
+    strncpy(recv_address.sun_path, wpa_recv_ctrl_iface.toStdString().c_str(), wpa_recv_ctrl_iface.length());
 
     if ((wpa_control_socket = socket(AF_UNIX, SOCK_DGRAM, 0)) == -1) {
         qCritical() << "socket() failed!";

@@ -24,23 +24,19 @@ MainWindow::MainWindow(QWidget *parent)
 
     wlanInfo = new WlanInfo;
     wpa_supplicant_control = new WPASupplicantControl(wlanInfo->wlan_interface_name);
-    wpa_supplicant_events_listener = new WPASupplicantEventsListener(wlanInfo->wlan_interface_name);
-
-    wpa_supplicant_control->send_cmd("PING");
-    qInfo() << wpa_supplicant_control->get_response();
+    wpa_supplicant_control->scan_for_networks();
 }
 
 MainWindow::~MainWindow()
 {
     delete wpa_supplicant_control;
-    delete wpa_supplicant_events_listener;
+//    delete wpa_supplicant_events_listener;
     delete wlanInfo;
     delete ui;
 }
 
 
 void MainWindow::on_refreshButton_clicked()
-
 {
     QListWidget *networksList = ui->listWidget;
     networksList->addItem("Hey There!");
@@ -48,7 +44,6 @@ void MainWindow::on_refreshButton_clicked()
 
 void MainWindow::on_wlanToggleButton_clicked()
 {
-
     if(wlanInfo->wlan_is_on()) {
         toggle_wlan(BLOCK);
     } else {
@@ -58,5 +53,7 @@ void MainWindow::on_wlanToggleButton_clicked()
 
 void MainWindow::on_listWidget_itemDoubleClicked(QListWidgetItem *item)
 {
+    QStringList networks_list;
     /* Connect to the selected network */
+    wpa_supplicant_control->scan_for_networks();
 }

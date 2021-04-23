@@ -2,7 +2,7 @@ QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-CONFIG += c++11 c11
+CONFIG += c++11
 
 # You can make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
@@ -13,15 +13,13 @@ SOURCES += \
     mainwindow.cpp \
     wlan_control.cpp \
     wlan_info.cpp \
-    wpa_supplicant_control.cpp \
-    wpa_supplicant_events_listener.cpp
+    wpa_supplicant_control.cpp
 
 HEADERS += \
     mainwindow.h \
     wlan_control.h \
     wlan_info.h \
-    wpa_supplicant_control.h \
-    wpa_supplicant_events_listener.h
+    wpa_supplicant_control.h
 
 FORMS += \
     mainwindow.ui

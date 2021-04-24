@@ -36,7 +36,7 @@ WPASupplicantControl::WPASupplicantControl(std::string wlan_interface_name)
     }
 
     /* Attatch to sending and receiving control interfaces */
-    if (connect(wpa_control_socket, (const struct sockaddr *)&send_address, sizeof(struct sockaddr_un)) == -1) {
+    if (::connect(wpa_control_socket, (const struct sockaddr *)&send_address, sizeof(struct sockaddr_un)) == -1) {
         qCritical() << "Error connecting to wpa_supplicant send control iface!";
         close(wpa_control_socket);
         exit(EXIT_FAILURE);
@@ -113,7 +113,12 @@ void WPASupplicantControl::scan_for_networks() {
     InitiateSearchThread *initiateSearchThread = new InitiateSearchThread(this);
     initiateSearchThread->start();
 
+    QObject::connect(initiateSearchThread, &InitiateSearchThread::resultReady, this, &WPASupplicantControl::process_networks_list);
     QObject::connect(initiateSearchThread, &InitiateSearchThread::finished, initiateSearchThread, &QObject::deleteLater);
+}
+
+void WPASupplicantControl::process_networks_list(const QStringList &networks_list) {
+    qInfo() << networks_list;
 }
 
 /* Constructor for the search thread */
@@ -143,5 +148,14 @@ void InitiateSearchThread::run() {
 
     /* Now get the scan results */
     wpaSupplicantControl->send_cmd("SCAN_RESULTS");
-    qInfo() << wpaSupplicantControl->get_response();
+    emit resultReady(this->format_networks_list(wpaSupplicantControl->get_response()));
+}
+
+QStringList InitiateSearchThread::format_networks_list(QString scan_results) {
+
+    QStringList networks_list;
+
+    networks_list = scan_results.split("\n");
+
+    return networks_list;
 }

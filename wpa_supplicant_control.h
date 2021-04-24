@@ -1,15 +1,18 @@
 #ifndef WPASUPPLICANTCONTROL_H
 #define WPASUPPLICANTCONTROL_H
 
-#include <QString>
 #include <QThread>
 
-class WPASupplicantControl
+class WPASupplicantControl: public QObject
 {
+    Q_OBJECT
 private:
     int wpa_control_socket;
     QString wpa_send_ctrl_iface;    // to issue commands to wpa_supplicant
     QString wpa_recv_ctrl_iface;    // to receive wpa_supplicant's response
+
+public slots:
+    void process_networks_list(const QStringList &networks_list);
 
 public:
     WPASupplicantControl(std::string wlan_interface_name);
@@ -28,8 +31,9 @@ public:
     InitiateSearchThread(WPASupplicantControl *wpaSupplicantControl);
 private:
     void run();
+    QStringList format_networks_list(QString scan_results);
 signals:
-    void resultReady(const QStringList &networksList);
+    void resultReady(const QStringList &networks_list);
 };
 
 #endif // WPASUPPLICANTCONTROL_H

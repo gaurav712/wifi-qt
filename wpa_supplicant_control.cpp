@@ -9,6 +9,7 @@
 #define WPA_SEND_CTRL_IFACE_PREFIX "/run/wpa_supplicant/"   // append if_name
 #define WPA_RECV_CTRL_IFACE_PREFIX "/tmp/wpa_ctrl_"    // append pid
 #define MAX_BUFFER_LEN  1024
+#define SSID_INDEX  4
 
 /* The Constructor */
 WPASupplicantControl::WPASupplicantControl(std::string wlan_interface_name)
@@ -120,7 +121,8 @@ void WPASupplicantControl::scan_for_networks() {
 }
 
 void WPASupplicantControl::process_networks_list(const QStringList &networks_list) {
-    qInfo() << networks_list;
+    for(int index = 0; index < networks_list.size(); index++)
+        qInfo() << ((networks_list[index]).split('\t'))[SSID_INDEX];
 }
 
 /* Constructor for the search thread */
@@ -157,7 +159,7 @@ QStringList InitiateSearchThread::format_networks_list(QString scan_results) {
 
     QStringList networks_list, temp;
 
-    temp = scan_results.split("\n");
+    temp = scan_results.split('\n');
 
     /* TO remove the top header line and the blank one at last */
     for(int index = 1; index < (temp.size() - 1); index++)

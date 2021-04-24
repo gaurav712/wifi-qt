@@ -54,7 +54,7 @@ WPASupplicantControl::WPASupplicantControl(std::string wlan_interface_name)
 
     /* issue the "ATTACH" command to wpa_supplicant to be able to receive events */
     this->send_cmd("ATTACH");
-    if ((this->get_response()) != "OK\n") {
+    if (!(this->get_response()).startsWith("OK\n")) {
         qCritical() << "Error initializing event listener!";
     }
 }

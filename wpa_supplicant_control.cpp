@@ -113,8 +113,10 @@ void WPASupplicantControl::scan_for_networks() {
     InitiateSearchThread *initiateSearchThread = new InitiateSearchThread(this);
     initiateSearchThread->start();
 
-    QObject::connect(initiateSearchThread, &InitiateSearchThread::resultReady, this, &WPASupplicantControl::process_networks_list);
-    QObject::connect(initiateSearchThread, &InitiateSearchThread::finished, initiateSearchThread, &QObject::deleteLater);
+    QObject::connect(initiateSearchThread, &InitiateSearchThread::resultReady,
+                     this, &WPASupplicantControl::process_networks_list);
+    QObject::connect(initiateSearchThread, &InitiateSearchThread::finished,
+                     initiateSearchThread, &QObject::deleteLater);
 }
 
 void WPASupplicantControl::process_networks_list(const QStringList &networks_list) {
@@ -153,9 +155,13 @@ void InitiateSearchThread::run() {
 
 QStringList InitiateSearchThread::format_networks_list(QString scan_results) {
 
-    QStringList networks_list;
+    QStringList networks_list, temp;
 
-    networks_list = scan_results.split("\n");
+    temp = scan_results.split("\n");
+
+    /* TO remove the top header line and the blank one at last */
+    for(int index = 1; index < (temp.size() - 1); index++)
+        networks_list.append(temp[index]);
 
     return networks_list;
 }

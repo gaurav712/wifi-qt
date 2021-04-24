@@ -16,13 +16,16 @@ public:
     ~WPASupplicantControl();
     void send_cmd(QString cmd);
     void scan_for_networks();
-    QString get_response();
+    QString get_response(bool logging = true);
 };
 
 /* The network scan thread class */
 class InitiateSearchThread: public QThread
 {
     Q_OBJECT
+public:
+    WPASupplicantControl *wpaSupplicantControl;
+    InitiateSearchThread(WPASupplicantControl *wpaSupplicantControl);
 private:
     void run();
 signals:

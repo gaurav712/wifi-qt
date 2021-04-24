@@ -66,11 +66,13 @@ WPASupplicantControl::~WPASupplicantControl() {
 
 /* Send Commands to wpa_supplicant */
 void WPASupplicantControl::send_cmd(QString cmd) {
-    send(wpa_control_socket, cmd.toStdString().c_str(), cmd.length(), 0);
+    if(send(wpa_control_socket, cmd.toStdString().c_str(), cmd.length(), 0) < 0) {
+        qCritical() << "Error sending command:" << cmd;
+    }
 }
 
 /* Get responses from commands issued to wpa_supplicant */
-QString WPASupplicantControl::get_response() {
+QString WPASupplicantControl::get_response(bool logging) {
 
     fd_set readfd;
     int result;
@@ -78,22 +80,25 @@ QString WPASupplicantControl::get_response() {
     char buffer[MAX_BUFFER_LEN + 1];    // for the '\0'
 
     timeout.tv_sec = 0;
-    timeout.tv_usec = 1000;
+    timeout.tv_usec = 10000;
 
     FD_ZERO(&readfd);
     FD_SET(wpa_control_socket, &readfd);
 
     if((result = select(wpa_control_socket + 1, &readfd, NULL, NULL, &timeout)) < 0) {
-        qCritical() << "Socket descriptor has no data to read!";
+        if(logging)
+            qCritical() << "Socket descriptor has no data to read!";
         return QString::fromStdString("");
     } else if(result == 0) {
-        qCritical() << "Timeout waiting for the socket descriptor!";
+        if(logging)
+            qCritical() << "Timeout waiting for the socket descriptor!";
         return QString::fromStdString("");
     }
 
     if(FD_ISSET(wpa_control_socket, &readfd)) {
         if((recv(wpa_control_socket, buffer, MAX_BUFFER_LEN, 0)) < 0) {
-            qCritical() << "Failed to read from socket descriptor!";
+            if(logging)
+                qCritical() << "Failed to read from socket descriptor!";
             return QString::fromStdString("");
         } else {
             return QString::fromStdString(buffer);
@@ -105,16 +110,38 @@ QString WPASupplicantControl::get_response() {
 
 /* Spawn a new thread and scan for available networks */
 void WPASupplicantControl::scan_for_networks() {
-    InitiateSearchThread *initiateSearchThread = new InitiateSearchThread();
+    InitiateSearchThread *initiateSearchThread = new InitiateSearchThread(this);
     initiateSearchThread->start();
 
     QObject::connect(initiateSearchThread, &InitiateSearchThread::finished, initiateSearchThread, &QObject::deleteLater);
 }
 
+/* Constructor for the search thread */
+InitiateSearchThread::InitiateSearchThread(WPASupplicantControl *wpaSupplicantControl)
+    :wpaSupplicantControl(wpaSupplicantControl)
+{}
+
 /* run() for the searching thread */
 void InitiateSearchThread::run() {
-    for(int i = 0; i < 3; i++) {
-        qInfo() << "Hey there! I am the new thread.";
-        sleep(1);
+
+    /* Issue the "SCAN" command */
+    wpaSupplicantControl->send_cmd("SCAN");
+
+    if(!wpaSupplicantControl->get_response().startsWith("OK\n")) {
+        qCritical() << "Failed to issue scan command!";
+        return;
     }
+
+    /* Now wait for the "SCAN_RESULTS" event */
+
+    do {
+        if(wpaSupplicantControl->get_response(false).contains("CTRL-EVENT-SCAN-RESULTS", Qt::CaseSensitive)) {
+            break;
+        }
+        this->msleep(100);
+    } while (true);
+
+    /* Now get the scan results */
+    wpaSupplicantControl->send_cmd("SCAN_RESULTS");
+    qInfo() << wpaSupplicantControl->get_response();
 }

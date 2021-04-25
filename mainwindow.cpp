@@ -24,12 +24,19 @@ MainWindow::MainWindow(QWidget *parent)
     this->move((QApplication::desktop()->width())/2 - (this->size().width())/2,
                (QApplication::desktop()->height())/2 - (this->size().height())/2);
 
+    /* Make the window non-resizable */
     this->setFixedSize(QApplication::desktop()->width()/3.5, QApplication::desktop()->height()/1.75);
 
+    /* Initialize the WlanInfo and WPASupplicantControl instances */
     wlanInfo = new WlanInfo;
     wpaSupplicantControl = new WPASupplicantControl(wlanInfo->wlan_interface_name);
+
+    /* Scan for networks when it starts up */
+    ui->refreshButton->setVisible(false);
     wpaSupplicantControl->scan_for_networks();
-    updateNetworkList = new UpdateNetworkList(wpaSupplicantControl, ui->listWidget);
+
+    /* Add the networks found to the listWidget */
+    updateNetworkList = new UpdateNetworkList(wpaSupplicantControl, ui->listWidget, ui->refreshButton);
     updateNetworkList->start();
 }
 
@@ -43,6 +50,9 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_refreshButton_clicked()
 {
+    /* Disable the refresh button */
+    ui->refreshButton->setVisible(false);
+
     wpaSupplicantControl->scan_for_networks();
     updateNetworkList->start();
 }
@@ -68,8 +78,12 @@ void MainWindow::on_listWidget_itemDoubleClicked(QListWidgetItem *item)
     qInfo() << item->text();
 }
 
-UpdateNetworkList::UpdateNetworkList(WPASupplicantControl *wpaSupplicantControl, QListWidget *listWidget)
-    :wpaSupplicantControl(wpaSupplicantControl), listWidget(listWidget)
+UpdateNetworkList::UpdateNetworkList(WPASupplicantControl *wpaSupplicantControl,
+                                     QListWidget *listWidget,
+                                     QPushButton *refreshButton)
+    :wpaSupplicantControl(wpaSupplicantControl)
+    , listWidget(listWidget)
+    , refreshButton(refreshButton)
 {}
 
 void UpdateNetworkList::run() {
@@ -87,4 +101,28 @@ void UpdateNetworkList::run() {
     for(int index = 0; index < wpaSupplicantControl->networks.size(); index++) {
         listWidget->addItem(wpaSupplicantControl->networks[index]);
     }
+
+    /* make the refresh button visible again */
+    run_on_main_thread( [this]{
+        refreshButton->setVisible(true);
+    });
+}
+
+/*
+ * run the specified callback() on the main thread
+ *
+ * Credits: https://riptutorial.com/qt/example/21783/using-qtimer-to-run-code-on-main-thread
+ */
+void UpdateNetworkList::run_on_main_thread(std::function<void()> callback)
+{
+    QTimer* timer = new QTimer();
+    timer->moveToThread(qApp->thread());
+    timer->setSingleShot(true);
+    QObject::connect(timer, &QTimer::timeout, [=]()
+    {
+        // execute the callback
+        callback();
+        timer->deleteLater();
+    });
+    QMetaObject::invokeMethod(timer, "start", Qt::QueuedConnection, Q_ARG(int, 0));
 }

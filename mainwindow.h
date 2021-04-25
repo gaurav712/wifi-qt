@@ -3,9 +3,11 @@
 
 #include <QMainWindow>
 #include <QListWidget>
+#include <QPushButton>
 #include <QStyle>
 #include <QDesktopWidget>
 #include <QScreen>
+#include <QTimer>
 
 #include "wlan_info.h"
 #include "wpa_supplicant_control.h"
@@ -18,11 +20,15 @@ class UpdateNetworkList: public QThread
 {
     Q_OBJECT
 public:
-    UpdateNetworkList(WPASupplicantControl *wpaSupplicantControl, QListWidget *listWidget);
+    UpdateNetworkList(WPASupplicantControl *wpaSupplicantControl,
+                      QListWidget *listWidget,
+                      QPushButton *refreshButton);
 private:
     WPASupplicantControl *wpaSupplicantControl;
     QListWidget *listWidget;
+    QPushButton *refreshButton;
     void run();
+    void run_on_main_thread(std::function<void()> callback);
 };
 
 class MainWindow : public QMainWindow

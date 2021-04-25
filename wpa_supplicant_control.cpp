@@ -9,7 +9,6 @@
 #define WPA_SEND_CTRL_IFACE_PREFIX "/run/wpa_supplicant/"   // append if_name
 #define WPA_RECV_CTRL_IFACE_PREFIX "/tmp/wpa_ctrl_"    // append pid
 #define MAX_BUFFER_LEN  1024
-#define SSID_INDEX  4
 
 #define RECV_TIMEOUT    10000    // in micro-seconds
 
@@ -130,8 +129,7 @@ void WPASupplicantControl::scan_for_networks() {
 
 void WPASupplicantControl::process_networks_list(const QStringList &networks_list) {
     for(int index = 0; index < networks_list.size(); index++)
-//        qInfo() << ((networks_list[index]).split('\t'))[SSID_INDEX];
-        networks.append(((networks_list[index]).split('\t'))[SSID_INDEX]);
+        networks.append(networks_list[index]);
 }
 
 /* Constructor for the search thread */

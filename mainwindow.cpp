@@ -6,6 +6,7 @@
 
 #define BLOCK   1
 #define UNBLOCK 0
+#define SSID_INDEX  4
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -99,7 +100,7 @@ void UpdateNetworkList::run() {
     }
 
     for(int index = 0; index < wpaSupplicantControl->networks.size(); index++) {
-        listWidget->addItem(wpaSupplicantControl->networks[index]);
+        listWidget->addItem((wpaSupplicantControl->networks[index]).split('\t')[SSID_INDEX]);
     }
 
     /* make the refresh button visible again */

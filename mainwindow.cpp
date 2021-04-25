@@ -24,6 +24,8 @@ MainWindow::MainWindow(QWidget *parent)
     this->move((QApplication::desktop()->width())/2 - (this->size().width())/2,
                (QApplication::desktop()->height())/2 - (this->size().height())/2);
 
+    this->setFixedSize(QApplication::desktop()->width()/3.5, QApplication::desktop()->height()/1.75);
+
     wlanInfo = new WlanInfo;
     wpaSupplicantControl = new WPASupplicantControl(wlanInfo->wlan_interface_name);
     wpaSupplicantControl->scan_for_networks();

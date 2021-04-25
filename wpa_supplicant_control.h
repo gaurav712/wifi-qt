@@ -15,6 +15,8 @@ public slots:
     void process_networks_list(const QStringList &networks_list);
 
 public:
+    QStringList networks;
+
     WPASupplicantControl(std::string wlan_interface_name);
     ~WPASupplicantControl();
     void send_cmd(QString cmd);

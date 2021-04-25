@@ -14,6 +14,17 @@ QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
 
+class UpdateNetworkList: public QThread
+{
+    Q_OBJECT
+public:
+    UpdateNetworkList(WPASupplicantControl *wpaSupplicantControl, QListWidget *listWidget);
+private:
+    WPASupplicantControl *wpaSupplicantControl;
+    QListWidget *listWidget;
+    void run();
+};
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -30,6 +41,10 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
-    WPASupplicantControl *wpa_supplicant_control;
+    WPASupplicantControl *wpaSupplicantControl;
+    UpdateNetworkList *updateNetworkList;
+
+    void append_rows();
 };
+
 #endif // MAINWINDOW_H

@@ -11,6 +11,8 @@
 #define MAX_BUFFER_LEN  1024
 #define SSID_INDEX  4
 
+#define RECV_TIMEOUT    10000    // in micro-seconds
+
 /* The Constructor */
 WPASupplicantControl::WPASupplicantControl(std::string wlan_interface_name)
     :wpa_send_ctrl_iface(WPA_SEND_CTRL_IFACE_PREFIX + QString::fromStdString(wlan_interface_name)),
@@ -81,7 +83,7 @@ QString WPASupplicantControl::get_response(bool logging) {
     char buffer[MAX_BUFFER_LEN + 1];    // for the '\0'
 
     timeout.tv_sec = 0;
-    timeout.tv_usec = 10000;
+    timeout.tv_usec = RECV_TIMEOUT;
 
     FD_ZERO(&readfd);
     FD_SET(wpa_control_socket, &readfd);
@@ -111,6 +113,12 @@ QString WPASupplicantControl::get_response(bool logging) {
 
 /* Spawn a new thread and scan for available networks */
 void WPASupplicantControl::scan_for_networks() {
+
+    /* Empty the networks list if it has elements */
+    for(int index = (networks.size() - 1); index >= 0; index--) {
+        networks.removeAt(index);
+    }
+
     InitiateSearchThread *initiateSearchThread = new InitiateSearchThread(this);
     initiateSearchThread->start();
 
@@ -122,7 +130,8 @@ void WPASupplicantControl::scan_for_networks() {
 
 void WPASupplicantControl::process_networks_list(const QStringList &networks_list) {
     for(int index = 0; index < networks_list.size(); index++)
-        qInfo() << ((networks_list[index]).split('\t'))[SSID_INDEX];
+//        qInfo() << ((networks_list[index]).split('\t'))[SSID_INDEX];
+        networks.append(((networks_list[index]).split('\t'))[SSID_INDEX]);
 }
 
 /* Constructor for the search thread */

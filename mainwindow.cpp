@@ -2,6 +2,8 @@
 #include "ui_mainwindow.h"
 #include "wlan_control.h"
 
+#include <QDebug>
+
 #define BLOCK   1
 #define UNBLOCK 0
 
@@ -23,23 +25,30 @@ MainWindow::MainWindow(QWidget *parent)
                (QApplication::desktop()->height())/2 - (this->size().height())/2);
 
     wlanInfo = new WlanInfo;
-    wpa_supplicant_control = new WPASupplicantControl(wlanInfo->wlan_interface_name);
-    wpa_supplicant_control->scan_for_networks();
+    wpaSupplicantControl = new WPASupplicantControl(wlanInfo->wlan_interface_name);
+    wpaSupplicantControl->scan_for_networks();
+    updateNetworkList = new UpdateNetworkList(wpaSupplicantControl, ui->listWidget);
+    updateNetworkList->start();
 }
 
 MainWindow::~MainWindow()
 {
-    delete wpa_supplicant_control;
-//    delete wpa_supplicant_events_listener;
+    delete updateNetworkList;
+    delete wpaSupplicantControl;
     delete wlanInfo;
     delete ui;
 }
 
-
 void MainWindow::on_refreshButton_clicked()
 {
-    QListWidget *networksList = ui->listWidget;
-    networksList->addItem("Hey There!");
+    wpaSupplicantControl->scan_for_networks();
+    updateNetworkList->start();
+}
+
+void MainWindow::append_rows() {
+    for(int index = 0; index < wpaSupplicantControl->networks.size(); index++) {
+        ui->listWidget->addItem(wpaSupplicantControl->networks[index]);
+    }
 }
 
 void MainWindow::on_wlanToggleButton_clicked()
@@ -53,7 +62,27 @@ void MainWindow::on_wlanToggleButton_clicked()
 
 void MainWindow::on_listWidget_itemDoubleClicked(QListWidgetItem *item)
 {
-    QStringList networks_list;
-    /* Connect to the selected network */
-    wpa_supplicant_control->scan_for_networks();
+//    QStringList networks_list;
+    qInfo() << item->text();
+}
+
+UpdateNetworkList::UpdateNetworkList(WPASupplicantControl *wpaSupplicantControl, QListWidget *listWidget)
+    :wpaSupplicantControl(wpaSupplicantControl), listWidget(listWidget)
+{}
+
+void UpdateNetworkList::run() {
+
+    /* Empty the list widget if it already has elements */
+    for(int index = (listWidget->count() - 1); index >= 0; index--) {
+        delete (listWidget->item(index));
+    }
+
+    /* Wait until the list is filled up */
+    while((wpaSupplicantControl->networks.isEmpty())) {
+        this->msleep(100);
+    }
+
+    for(int index = 0; index < wpaSupplicantControl->networks.size(); index++) {
+        listWidget->addItem(wpaSupplicantControl->networks[index]);
+    }
 }

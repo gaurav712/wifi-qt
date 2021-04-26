@@ -6,8 +6,10 @@
 
 #define BLOCK   1
 #define UNBLOCK 0
-#define SSID_INDEX  4
+#define SSID_INDEX          4
+#define PROTECTION_INDEX    3
 
+/* Constructor for the Main Window */
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -58,12 +60,7 @@ void MainWindow::on_refreshButton_clicked()
     updateNetworkList->start();
 }
 
-void MainWindow::append_rows() {
-    for(int index = 0; index < wpaSupplicantControl->networks.size(); index++) {
-        ui->listWidget->addItem(wpaSupplicantControl->networks[index]);
-    }
-}
-
+/* Toggle wlan */
 void MainWindow::on_wlanToggleButton_clicked()
 {
     if(wlanInfo->wlan_is_on()) {
@@ -73,12 +70,74 @@ void MainWindow::on_wlanToggleButton_clicked()
     }
 }
 
+/* Initiate connection to the selected network */
 void MainWindow::on_listWidget_itemDoubleClicked(QListWidgetItem *item)
 {
-//    QStringList networks_list;
-    qInfo() << item->text();
+    bool pass_entered = false;
+    bool is_protected;
+    QString psk = "";
+
+    psk = QInputDialog::getText(this,
+                                tr("QInputDialog::getText()"),
+                                tr("Enter Password"),
+                                QLineEdit::Normal,
+                                "", &pass_entered);
+
+    if(pass_entered) {
+        if(network_is_protected(item->text())) {
+            is_protected = true;
+        } else {
+            is_protected = false;
+        }
+
+        /* Initiate the thread to authenticate with the network */
+        AuthenticateToNetwork *authenticateToNetwork = new AuthenticateToNetwork(
+                    wpaSupplicantControl,
+                    item->text(),   // SSID
+                    psk,
+                    is_protected);
+
+        authenticateToNetwork->start();
+
+        /* To handle authentication results */
+        QObject::connect(authenticateToNetwork, &AuthenticateToNetwork::authenticatedToNetwork,
+                         this, &MainWindow::on_networkAuthenticated);
+
+        /* Make sure it is destroyed */
+        QObject::connect(authenticateToNetwork, &AuthenticateToNetwork::finished,
+                         authenticateToNetwork, &QObject::deleteLater);
+    }
 }
 
+/* Check if network is open or protected */
+bool MainWindow::network_is_protected(QString ssid) {
+
+    for(int index = 0; index < wpaSupplicantControl->networks.size(); index++) {
+        if(wpaSupplicantControl->networks[index].split('\t')[SSID_INDEX] == ssid) {
+            if(wpaSupplicantControl->networks[index].split('\t')[PROTECTION_INDEX] == "[ESS]") {
+                return false;
+            }
+        }
+    }
+
+    return true;
+}
+
+/*
+ * Handle authentication results
+ * like: Warning popup on Failure
+ */
+void MainWindow::on_networkAuthenticated(bool authenticated) {
+
+    /* Just these debug messages for now */
+    if(authenticated) {
+        qDebug() << "Connected!";
+    } else {
+        qDebug() << "Connection failed!";
+    }
+}
+
+/* Constructor for the thread updating networks list */
 UpdateNetworkList::UpdateNetworkList(WPASupplicantControl *wpaSupplicantControl,
                                      QListWidget *listWidget,
                                      QPushButton *refreshButton)
@@ -126,4 +185,25 @@ void UpdateNetworkList::run_on_main_thread(std::function<void()> callback)
         timer->deleteLater();
     });
     QMetaObject::invokeMethod(timer, "start", Qt::QueuedConnection, Q_ARG(int, 0));
+}
+
+/* Contructor for thread used for connecting to networks */
+AuthenticateToNetwork::AuthenticateToNetwork(WPASupplicantControl *wpaSupplicantControl,
+                                             QString ssid,
+                                             QString psk,
+                                             bool is_protected)
+    :wpaSupplicantControl(wpaSupplicantControl)
+    , ssid(ssid)
+    , psk(psk)
+    , is_protected(is_protected)
+{}
+
+void AuthenticateToNetwork::run() {
+
+    bool authenticated = false;
+
+    this->sleep(2);
+    qDebug() << "Inside the thread" << ssid << psk;
+
+    emit authenticatedToNetwork(authenticated);
 }

@@ -11,7 +11,7 @@ private:
     QString wpa_send_ctrl_iface;    // to issue commands to wpa_supplicant
     QString wpa_recv_ctrl_iface;    // to receive wpa_supplicant's response
 
-public slots:
+private slots:
     void process_networks_list(const QStringList &networks_list);
 
 public:

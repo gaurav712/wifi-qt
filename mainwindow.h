@@ -8,6 +8,7 @@
 #include <QDesktopWidget>
 #include <QScreen>
 #include <QTimer>
+#include <QInputDialog>
 
 #include "wlan_info.h"
 #include "wpa_supplicant_control.h"
@@ -31,6 +32,25 @@ private:
     void run_on_main_thread(std::function<void()> callback);
 };
 
+class AuthenticateToNetwork: public QThread
+{
+    Q_OBJECT
+public:
+    AuthenticateToNetwork(WPASupplicantControl *wpaSupplicantControl,
+                          QString ssid,
+                          QString psk,
+                          bool is_protected);
+private:
+    WPASupplicantControl *wpaSupplicantControl;
+    QString ssid;
+    QString psk;
+    bool is_protected;
+    void run();
+
+signals:
+    void authenticatedToNetwork(bool authenticated);
+};
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -44,13 +64,14 @@ private slots:
     void on_refreshButton_clicked();
     void on_wlanToggleButton_clicked();
     void on_listWidget_itemDoubleClicked(QListWidgetItem *item);
+    void on_networkAuthenticated(bool authenticated);
 
 private:
     Ui::MainWindow *ui;
     WPASupplicantControl *wpaSupplicantControl;
     UpdateNetworkList *updateNetworkList;
 
-    void append_rows();
+    bool network_is_protected(QString ssid);
 };
 
 #endif // MAINWINDOW_H
